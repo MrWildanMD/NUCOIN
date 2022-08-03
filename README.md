@@ -9,7 +9,7 @@
 
 ## Features
 | Admin                | Bendahara            | Kolektor             |
-| -------------------- |:--------------------:|:--------------------:|
+|:--------------------:|:--------------------:|:--------------------:|
 | Manage Users         | Manage Coins Records | Manage Coins Records |
 | Manage Roles         | -                    | -                    |
 | Manage Coins Records | -                    | -                    |
