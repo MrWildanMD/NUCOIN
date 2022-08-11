@@ -47,7 +47,7 @@
 
     <script src="{{ asset('assets/js/app.js') }}"></script>
     <script>
-        // window.print();
+        window.print();
     </script>
 </body>
 

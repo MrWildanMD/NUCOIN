@@ -72,6 +72,7 @@ class CoinsDataTable extends DataTable
         return $this->builder()
             ->setTableId('coins-table')
             ->serverSide(true)
+            ->language('//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Indonesian.json')
             ->responsive(true)
             ->columns($this->getColumns())
             ->minifiedAjax()

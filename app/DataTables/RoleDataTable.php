@@ -59,6 +59,7 @@ class RoleDataTable extends DataTable
             ->setTableId('table1')
             ->responsive(true)
             ->serverSide(true)
+            ->language('//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Indonesian.json')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1);
