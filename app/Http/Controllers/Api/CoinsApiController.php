@@ -7,8 +7,10 @@ use App\Http\Resources\CoinsResource;
 use App\Models\Coins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\File;
+use App\Http\Controllers\Api\BaseApiController;
 
-class CoinsApiController extends Controller
+class CoinsApiController extends BaseApiController
 {
     // public function __construct()
     // {
@@ -128,9 +130,9 @@ class CoinsApiController extends Controller
             $validator = Validator::make($input, [
                 'amount' => 'required',
                 'coin_date' => 'required',
-                'proof' => 'required',
-                'user_id' => 'required',
-                'donator_id' => 'required',
+                'proof' => ['required', File::image()->min(512)->max(2048)],
+                'user_id' => 'exists:users,id',
+                'donator_id' => 'exists:donators,id',
             ]);
 
             if ($validator->fails()) {
