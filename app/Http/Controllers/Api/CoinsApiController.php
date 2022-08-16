@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\CoinsResource;
 use App\Models\Coins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\File;
 use App\Http\Controllers\Api\BaseApiController;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
 
 class CoinsApiController extends BaseApiController
 {
@@ -25,6 +25,7 @@ class CoinsApiController extends BaseApiController
     {
         if (auth('sanctum')->user()) {
             $coins = Coins::all();
+            // $coins = base64_encode($coins->proof);
             return $this->successResponse(CoinsResource::collection($coins), 'List of coins record retrieved.');
         }
         return $this->errorResponse('Unauthorized', [], 401);
@@ -64,11 +65,18 @@ class CoinsApiController extends BaseApiController
             }
 
             if ($validator->validated()) {
-                $image = $request->file('proof');
+                // $image = $request->file('proof');
 
-                $imageName = time() . "." . $image->extension();
+                // $imageName = time() . "." . $image . '.png';
 
-                $image->move(public_path('images'), $imageName);
+                // $paths = public_path('images') . $imageName;
+
+                // // $image->move(public_path('images'), $imageName);
+                // Image::make(file_get_contents($input['proof']))->save($paths);
+
+                $file = base64_decode($input['proof']);
+                $imageName = time() . '.' . 'png';
+                file_put_contents(public_path('images') . '/' . $imageName, $file);
 
                 $input['proof'] = $imageName;
 
@@ -91,7 +99,7 @@ class CoinsApiController extends BaseApiController
             $coins = Coins::find($id);
 
             if (is_null($coins)) {
-                return $this->errorResponse('Donator not found.');
+                return $this->errorResponse('Coins record not found.');
             }
 
             return $this->successResponse(new CoinsResource($coins), 'Coins record retrieved successfully.');
@@ -117,22 +125,18 @@ class CoinsApiController extends BaseApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Coins $coins)
+    public function update(Request $request, $id)
     {
         if (auth('sanctum')->user()) {
-
-            $image = $coins->proof;
-            if (file_exists('images/' . $image)) {
-                unlink('images/' . $image);
-            }
+            $coins = Coins::find($id);
             $input = $request->all();
 
             $validator = Validator::make($input, [
                 'amount' => 'required',
                 'coin_date' => 'required',
-                'proof' => ['required', File::image()->min(512)->max(2048)],
-                'user_id' => 'exists:users,id',
-                'donator_id' => 'exists:donators,id',
+                'proof' => 'required',
+                'user_id' => 'required',
+                'donator_id' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -140,11 +144,25 @@ class CoinsApiController extends BaseApiController
             }
 
             if ($validator->validated()) {
-                $image = $request->file('proof');
+                $image = $coins->proof;
+                if (file_exists('images/' . $image)) {
+                    File::delete('images/' . $image);
+                }
 
-                $imageName = time() . "." . $image->extension();
+                // $image = $request->file('proof');
 
-                $image->move(public_path('images'), $imageName);
+                // $imageName = time() . "." . $image . '.png';
+
+                // $paths = public_path('images') . $imageName;
+
+                // // $image->move(public_path('images'), $imageName);
+                // Image::make(file_get_contents($input['proof']))->save($paths);
+
+                // $input['proof'] = $imageName;
+
+                $file = base64_decode($input['proof']);
+                $imageName = time() . '.' . 'png';
+                file_put_contents(public_path('images') . '/' . $imageName, $file);
 
                 $input['proof'] = $imageName;
 
@@ -167,11 +185,12 @@ class CoinsApiController extends BaseApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Coins $coins)
+    public function destroy($id)
     {
         if (auth('sanctum')->user()) {
+            $coins = Coins::find($id);
             $image = $coins->proof;
-            unlink('images/' . $image);
+            File::delete('images/' . $image);
             $coins->delete();
 
             return $this->successResponse([], 'Coins record removed.');
